@@ -4,7 +4,6 @@ Uploader = require('./lib/Uploader')
 
 Options = [
   [ 'apiToken', 'api-token' ]
-  [ 'documentSetId', 'document-set-id' ]
   [ 'server', 'server' ]
 ]
 

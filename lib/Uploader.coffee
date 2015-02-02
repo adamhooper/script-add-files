@@ -1,6 +1,7 @@
 debug = require('debug')('Uploader')
 fs = require('fs')
 request = require('request')
+contentDisposition = require('content-disposition')
 uuid = require('node-uuid')
 Promise = require('bluebird')
 MassUpload = require('js-mass-upload')
@@ -9,7 +10,6 @@ module.exports = class Uploader
   constructor: (@options) ->
     throw 'Must pass options.server, a server URL' if !@options.server
     throw 'Must pass options.apiToken, an API Token' if !@options.apiToken
-    throw 'Must pass options.documentSetId, a DocumentSet ID' if !@options.documentSetId
 
     @massUpload = new MassUpload
       doListFiles: @_doListFiles.bind(@)
@@ -24,11 +24,15 @@ module.exports = class Uploader
     @reqPromise = Promise.promisify(@req)
 
   _doUploadFile: (file, progress, success, error) ->
-    guid = uuid.v4(random: new Buffer(file.name + '        ', 'utf-8').slice(0, 16).toJSON())
+    guid = uuid.v4()
     debug("Uploading #{file.name}...")
 
+    headers =
+      'Content-Length': file.size
+      'Content-Disposition': contentDisposition(file.name)
+
     stream = fs.createReadStream(file.name)
-    stream.pipe(@req.post("#{@options.server}/api/v1/files/#{guid}", headers: { 'Content-Length': file.size }))
+    stream.pipe(@req.post("#{@options.server}/api/v1/files/#{guid}", headers: headers))
       .on('error', (e) -> console.warn(e); error(e))
       .on 'response', (response) ->
         if 200 <= response.statusCode < 300
