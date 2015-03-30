@@ -16,7 +16,7 @@ programmatically or through the UI.
 
 1. Browse to https://www.overviewproject.org/api-tokens and click "Generate token".
 2. Copy the token you just generated. We'll refer to this token as `$CREATOR_API_TOKEN` and use it to create document sets.
-3. `curl -XPOST 'https://www.overviewproject.org/api/v1/document-sets' -u '$CREATOR_API_TOKEN:x-auth-token' -d 'title=some-title'`
+3. `curl -XPOST 'https://www.overviewproject.org/api/v1/document-sets' -u "$CREATOR_API_TOKEN:x-auth-token" -H "Content-Type: application/json" -d '{"title":"some-title"}'`
 4. Scan the JSON result for `documentSet.id`. We'll refer to this as `$DOCUMENT_SET_ID`.
 5. Scan the JSON result for `apiToken.token`. We'll refer to this token as `$API_TOKEN` and use it to add documents to document set `$DOCUMENT_SET_ID`.
 
@@ -48,5 +48,8 @@ DEBUG='*' ./index.js \
     --api-token="$API_TOKEN" \
     file1.txt [file2.doc [file3.pdf [...]]]
 
-curl -XPOST 'https://www.overviewproject.org/api/v1/files/finish' -u "$API_TOKEN:x-auth-token"
+curl -XPOST 'https://www.overviewproject.org/api/v1/files/finish' \
+    -u "$API_TOKEN:x-auth-token" \
+    -H "Content-Type: application/json" \
+    -d '{"lang":"en"}'
 ```
